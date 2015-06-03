@@ -23,5 +23,5 @@ eRanker API Starter Kit was created by and is maintained by [eRanker.com develop
 
 ## Copyright and License
 
-Copyright 2013-2015 eRanker.com.
+Copyright 2014-2015 eRanker.com.
 Code released under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) license.
