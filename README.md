@@ -1,2 +1,2 @@
-# starter-kit
-eRanker API Starter Kit
+# eRanker API Starter Kit
+This is a DEMO project that uses eRanker API.
