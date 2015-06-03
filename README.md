@@ -1,5 +1,10 @@
 # eRanker API Starter Kit
 This is a DEMO project that uses eRanker API.
+It contains some basic features like:
+* Create Report
+* View and print Report
+* Generate PDF
+* Latest Reports
 
 ## Getting Started
 
