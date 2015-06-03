@@ -13,6 +13,9 @@ To run this project you will need a valid [eRanker API key](http://www.eranker.c
 * Copy the code to your server
 * Edit the config.php file and add your own API key
 
+## API Docs
+If you need some details about each [eRanker API command](http://www.eranker.com/api/functions) you can see the [API documentation] (http://www.eranker.com/api) or ask questions on our [support group](http://www.eranker.com/api/support).
+
 ## Bugs and Issues 
 
 Have a bug or an issue with this project? [Open a new issue](https://github.com/eranker/starter-kit/issues) here on GitHub or [send us an email](http://www.eranker.com/contact).
