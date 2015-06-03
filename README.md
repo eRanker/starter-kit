@@ -19,7 +19,7 @@ Have a bug or an issue with this project? [Open a new issue](https://github.com/
 
 ## Creator
 
-eRanker API Starter Kit was created by and is maintained by **[eRanker.com development team](http://www.eranker.com/).**
+eRanker API Starter Kit was created by and is maintained by [eRanker.com development team](http://www.eranker.com/).
 
 ## Copyright and License
 
