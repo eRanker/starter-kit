@@ -10,7 +10,7 @@ To run this project you will need a valid [eRanker API key](http://www.eranker.c
 
 ## Bugs and Issues
 
-Have a bug or an issue with this template? [Open a new issue](https://github.com/eranker/starter-kit/issues) here on GitHub or [send us an email](http://www.eranker.com/contact).
+Have a bug or an issue with this project? [Open a new issue](https://github.com/eranker/starter-kit/issues) here on GitHub or [send us an email](http://www.eranker.com/contact).
 
 ## Creator
 
