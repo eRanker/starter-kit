@@ -79,15 +79,12 @@
                                 </div>
                                 <!-- /input-group -->
                             </li>
-                            <?PHP var_dump($page) ?>
                             <li>
                                 <a href="/index.php?p=home" <?PHP echo (strcmp('home', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-home fa-fw"></i> Home</a>
                             </li>
-                            <?PHP var_dump($page) ?>
-                             <li>
+                            <li>
                                 <a href="/index.php?p=createreport" <?PHP echo (strcmp('createreport', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-plus-circle fa-fw"></i> Create Report</a>
                             </li>
-                            <?PHP var_dump($page) ?>
                             <li>
                                 <a href="/index.php?p=reports" <?PHP echo (strcmp('reports', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-file fa-fw"></i> Latest Reports</a>
                             </li>
@@ -106,10 +103,13 @@
             </nav>
 
             <div id="page-wrapper">
-
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h1 class="page-header"><?PHP echo $page_title ?></h1>
+                <?PHP if (!empty($page_title)) { ?>                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h1 class="page-header"><?PHP echo $page_title ?></h1>
+                        </div>
+                        <!-- /.col-lg-12 -->
                     </div>
-                    <!-- /.col-lg-12 -->
-                </div>
+                <?PHP } else { ?>
+                    <br /> 
+                <?PHP } ?>
