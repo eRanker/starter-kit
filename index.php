@@ -9,7 +9,6 @@ if (isset($_GET['p']) && !empty($_GET['p']) && ctype_alnum($_GET['p'])) {
     }
 }
 
-
 //Include the config file  (laod settings and libraries)
 require_once 'config.php';
 
