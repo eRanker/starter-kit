@@ -48,16 +48,17 @@
                     <!-- /.dropdown -->
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                            <i class="fa fa-user fa-fw"></i> <?PHP echo (!empty($erapi_accountinfo) && isset($erapi_accountinfo->email)) ? $erapi_accountinfo->email : "Unknown User" ?> <i class="fa fa-caret-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                            </li>
-                            <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                            </li>
+                            <li>
+                                <a  href="/index.php?p=accountinfo" <?PHP echo (strcmp('accountinfo', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-user fa-fw"></i> Settings</a>
+                            </li>     
                             <li class="divider"></li>
-                            <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                            <li>      
+                                <a href="/index.php?p=help" <?PHP echo (strcmp('help', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-life-ring fa-fw"></i> Help</a>
                             </li>
+
                         </ul>
                         <!-- /.dropdown-user -->
                     </li>
@@ -68,17 +69,7 @@
                 <div class="navbar-default sidebar" role="navigation">
                     <div class="sidebar-nav navbar-collapse">
                         <ul class="nav" id="side-menu">
-                            <li class="sidebar-search">
-                                <div class="input-group custom-search-form">
-                                    <input type="text" class="form-control" placeholder="Search...">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <!-- /input-group -->
-                            </li>
+
                             <li>
                                 <a href="/index.php?p=home" <?PHP echo (strcmp('home', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-home fa-fw"></i> Home</a>
                             </li>
