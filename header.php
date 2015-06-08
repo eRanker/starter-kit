@@ -5,8 +5,8 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="<?PHP echo $page_title ?>">
-        <title><?PHP echo $page_desc ?></title>
+        <meta name="description" content="<?PHP echo $page_title . " - " . $project_name ?>">
+        <title><?PHP echo $page_desc . " - " . $project_name ?></title>
 
         <!-- Theme CSS -->
         <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -39,7 +39,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.html">SB Admin v2.0</a>
+                    <a class="navbar-brand" href="index.php"><img src="img/logo-30px.png" width="30" height="30" style="display: inline;" alt="<?PHP echo $project_name ?>" /> <?PHP echo $project_name ?></a>
                 </div>
                 <!-- /.navbar-header -->
 
@@ -362,3 +362,10 @@
             </nav>
 
             <div id="page-wrapper">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header"><?PHP echo $page_title ?></h1>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
