@@ -1,8 +1,8 @@
 <?php
 
 //CHANGE THIS SETTINGS - http://www.eranker.com/settings
-$eranker_apikey = "ee9978e1e5280ace6c0a3e99a77ea48c";
 $eranker_apiemail = "renan@georanker.com";
+$eranker_apikey = "ee9978e1e5280ace6c0a3e99a77ea48c";
 
 //Required Files
 require_once 'libs/createimage.php';
