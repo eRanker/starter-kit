@@ -1,7 +1,7 @@
 <?php
 
 //Get the page name
-$page = "createreport";
+$page = "home";
 if (isset($_GET['p']) && !empty($_GET['p']) && ctype_alnum($_GET['p'])) {
     $page = trim($_GET['p']);
     if (!file_exists('pages/' . $page . '-init.php')) {
