@@ -769,7 +769,7 @@ class eRankerCommons {
      * @param boolean $is_pdf Tell if we are generating a pdf or not
      * @return string The html of the report. 
      */
-    public static function getReportHTML($report, $reportScores, $fullfactors, $logged_in = false, $is_pdf = false, $disable_pdf = false) {
+    public static function getReportHTML($report, $reportScores, $fullfactors, $logged_in = false, $is_pdf = false, $disable_pdf = false, $show_header = TRUE, $show_title = TRUE, $show_category = TRUE) {
         //Make sure that the factors is on the array format
         $fullfactors = self::objectToArray($fullfactors);
 
@@ -778,7 +778,7 @@ class eRankerCommons {
 
         $out = "<div class='superreport-seo'>";
         $out .= "<div id='erreport'>";
-        $out .= self::getReportScoreHTML($report, $reportScores['score'], self::BIG, $disable_pdf);
+        $out .= self::getReportScoreHTML($report, $reportScores['score'], self::BIG, $disable_pdf, $show_header, $show_title, $show_category);
 
         $categories = array();
         $groups = array();
@@ -812,10 +812,14 @@ class eRankerCommons {
                     $out .= "\r\n";
                     $out .= '<div class="ercategory" data-category_id="' . $category_id . '" >';
                     $out .= '<div class="ercategoryheadline">';
-                    $out .= '<h2 onclick="$(\'.ercategorydescription[data-category_id=' . $category_id . ']\').slideToggle();" class="ercategoryname" style="border-color: #' . $categories[$category_id]['bg_color'] . '">';
-                    $out .= '<img src="' . $categories[$category_id]['icon'] . '" class="ercategoryicon" alt="{icon}" /> ';
-                    $out .= $categories[$category_id]['friendly_name'];
-                    $out .= '</h2>';
+                    if ($show_category) {
+                        $out .= '<h2 onclick="$(\'.ercategorydescription[data-category_id=' . $category_id . ']\').slideToggle();" class="ercategoryname" style="border-color: #' . $categories[$category_id]['bg_color'] . '">';
+                        $out .= '<img src="' . $categories[$category_id]['icon'] . '" class="ercategoryicon" alt="{icon}" /> ';
+                        $out .= $categories[$category_id]['friendly_name'];
+                        $out .= '</h2>';
+                    }
+
+
                     $out .= '<div class="ercategoryprogressbar"></div>';
                     $out .= '</div>';
                     $out .= '<div class="ercategorydescription" data-category_id="' . $category_id . '" style="display:none">' . $categories[$category_id]['description'] . '</div>';
@@ -825,10 +829,12 @@ class eRankerCommons {
                         if (!empty($group_array)) {
                             $out .= "\r\n";
                             $out .= '<div class="ergroup row" data-group_id="' . $group_id . '" >';
-                            $out .= '<h3 class="ergroupname ' . (($is_odd_row) ? 'eroddrow' : '') . '">' . $groups[$group_id]['friendly_name'] . '</h3>';
+                            if ($show_title) {
+                                $out .= '<h3 class="ergroupname ' . (($is_odd_row) ? 'eroddrow' : '') . '">' . $groups[$group_id]['friendly_name'] . '</h3>';
+                            }
                             $is_even = false;
                             foreach ($group_array as $factor_id) {
-                                $out .= self::getFactorHTML($report, $fullfactors[$factor_id], $reportScores[$factor_id], $is_even, $logged_in);
+                                $out .= self::getFactorHTML($report, $fullfactors[$factor_id], $reportScores[$factor_id], $is_even, $logged_in, $show_header, $show_title, $show_category);
                                 $is_even = !$is_even;
                             }
                             $out .= "</div>\r\n";
@@ -873,72 +879,84 @@ class eRankerCommons {
      * @param string $format The format/theme we shall output. Default: BIG
      * @return string The html of the report score (the top part of a report). 
      */
-    public static function getReportScoreHTML($report, $generalscore, $format = self::BIG, $disable_pdf = false) {
+    public static function getReportScoreHTML($report, $generalscore, $format = self::BIG, $disable_pdf = false, $show_header = TRUE, $show_title = TRUE, $show_category = TRUE) {
 
         $out = "";
+        if ($show_header) {
+            $report_url = trim(str_replace("http://", "", str_replace("https://", "", $report->url)), " /\\");
 
-        $report_url = trim(str_replace("http://", "", str_replace("https://", "", $report->url)), " /\\");
+            $score_raw_total = $generalscore['factors']['missing'] + $generalscore['factors']['green'] + $generalscore['factors']['orange'] + $generalscore['factors']['red'];
 
-        $score_raw_total = $generalscore['factors']['missing'] + $generalscore['factors']['green'] + $generalscore['factors']['orange'] + $generalscore['factors']['red'];
+            if (isset($_GET['pdf']) && !empty($_GET['pdf'])) {
+                $classResponsiveFactorsPercent = 'width: 25% !important; float: left !important;';
+                $classResponsiveScores = 'width: 41.66666667% !important; float: left !important;';
+                $classResponsiveFactorSite = 'width: 33.33333333% !important; float: left !important;';
+            } else {
+                $classResponsiveFactorsPercent = '';
+                $classResponsiveScores = '';
+                $classResponsiveFactorSite = '';
+            }
+            $classPercent = (isset($_GET['pdf']) && !empty($_GET['pdf'])) ? '' : 'col-sm-4 col-md-2';
+            $out .= '<div class="row score-table">';
+            $out .= '<div class="' . $classPercent . ' col-lg-3 col-lg-3 factors-percent" style="padding:0 ' . $classResponsiveFactorsPercent . '">' // factors-percent
+                    . '<aside>'
+                    . '<div class="overall-score">'
+                    . '<p>Overall</p>'
+                    . '<p class="reportfinalscore">' . round($generalscore['percentage']) . '</p>'
+                    . '<p>out of 100</p>'
+                    . '<div class="circle" id="circles" data-percent="' . $generalscore['percentage'] . '" ></div>' // percentage chart
+                    . '</div>' // overall
+                    . '<div class="additional-ratings">'
+                    . '<span>Generated on ' . self::convertDateTime($report->date_created, 'UTC') . '</span><br />';
+            if ($disable_pdf == FALSE) {
+                $out .= '<a id="update-now" onclick="hasSupport()">Update now</a></span>';
+            }
+            $out .= '<ul id="rating-stars">';
+            $ratings = array('starsbg' => 'star-o', 'stars' => 'star'); // store rating stars
+            foreach ($ratings as $position => $stars):
+                $out .= '<li class="rating-' . $position . '" style="' . ( $position == 'stars' ? 'width:' . round($generalscore['percentage']) / 10 * 10.6 . 'px' : '' ) . '"><div>';
+                for ($i = 0; $i < 5; $i++): // 5 stars
+                    $out .= '<i class="fa fa-' . $stars . '"></i>';
+                endfor;
+                $out .= '</div></li>';
+            endforeach;
+            $out .= '</ul>'
+                    . '</div>' // additional ratings
+                    . '</aside>';
+            if ($disable_pdf) {
+                $out .= '<div><a href="/export?id=' . $report->id . '&amp;type=pdf" id="download-pdf">Donwload PDF Report</a></div>';
+            } else {
+                $out .= '<div><a href="/' . $report->domain . '/' . $report->id .
+                        $out .= '<div><a download id="download-pdf" onclick="hasSupport()">Download PDF Report</a></div>';
+            }
 
-        $out .= '<div class="row score-table">';
-        $out .= '<div class="col-sm-4 col-md-2 col-lg-3 factors-percent" style="padding:0">' // factors-percent
-                . '<aside>'
-                . '<div class="overall-score">'
-                . '<p>Overall</p>'
-                . '<p class="reportfinalscore">' . round($generalscore['percentage']) . '</p>'
-                . '<p>out of 100</p>'
-                . '<div class="circle" id="circles" data-percent="' . $generalscore['percentage'] . '" ></div>' // percentage chart
-                . '</div>' // overall
-                . '<div class="additional-ratings">'
-                . '<span>Generated on ' . self::convertDateTime($report->date_created, 'UTC') . '</span><br />';
-        if ($disable_pdf == FALSE) {
-            $out .= '<a id="update-now" onclick="hasSupport()">Update now</a></span>';
+            $thumb_URL = "https://www.eranker.com/IMAGE"; //FIXTHIS
+
+            if (!isset($generalscore['thumbnail']) || empty($generalscore['thumbnail'])) {
+                $thumb_URL = self::$imgfolder . "loading-page-preview.gif";
+            } else {
+                $thumb_URL = $generalscore['thumbnail'];
+            }
+            $classfactorSite = (isset($_GET['pdf']) && !empty($_GET['pdf'])) ? ' ' : 'col-md-5 hidden-xs hidden-sm';
+            $classScores = (isset($_GET['pdf']) && !empty($_GET['pdf'])) ? ' ' : 'col-sm-8 col-md-5';
+            $out .= '</div>' // end factors-percent
+                    . '<div class="' . $classScores . ' col-lg-5 factors-score" style="' . $classResponsiveScores . '">' // factors score
+                    . '<p>Report for URL:</p>'
+                    . '<h1>' . $report_url . '</h1>'
+                    . '<ul>'
+                    . '<li class="col green"><i class="fa fa-check"></i><b class="factor-score">Successfully passed<span>' . $generalscore['factors']['green'] . '</span></b><div class="factorbar" style="width:' . ($generalscore['factors']['green'] * 100 / $score_raw_total) . '%"></div></li>'
+                    . '<li class="col orange"><i class="fa fa-minus"></i><b class="factor-score">Room for improvement<span>' . $generalscore['factors']['orange'] . '</span></b><div class="factorbar" style="width:' . ($generalscore['factors']['orange'] * 100 / $score_raw_total) . '%"></div></li>'
+                    . '<li class="col red"><i class="fa fa-times"></i><b class="factor-score">Errors<span>' . ( $generalscore['factors']['red'] + $generalscore['factors']['missing'] ) . '</span></b><div class="factorbar" style="width:' . ($generalscore['factors']['red'] * 100 / $score_raw_total) . '%"></div></li>'
+                    . '</ul>'
+                    . '<div class="clearfix"></div>'
+                    . '</div>' // end factors-score
+                    . '<div class="' . $classfactorSite . ' col-lg-4 factors-site" style="' . $classResponsiveFactorSite . '">' // site screen
+                    . '<div class="printscreen">'
+                    . '<img id="sitescreen" alt="Website Screenshot: ' . $report_url . '" src="' . $thumb_URL . '">' // actual site screen
+                    . '</div>'
+                    . '</div>'; // end factors-site
+            $out .= '</div><div class="clearfix"></div>'; // end score-table
         }
-        $out .= '<ul id="rating-stars">';
-        $ratings = array('starsbg' => 'star-o', 'stars' => 'star'); // store rating stars
-        foreach ($ratings as $position => $stars):
-            $out .= '<li class="rating-' . $position . '" style="' . ( $position == 'stars' ? 'width:' . round($generalscore['percentage']) / 10 * 10.6 . 'px' : '' ) . '"><div>';
-            for ($i = 0; $i < 5; $i++): // 5 stars
-                $out .= '<i class="fa fa-' . $stars . '"></i>';
-            endfor;
-            $out .= '</div></li>';
-        endforeach;
-        $out .= '</ul>'
-                . '</div>' // additional ratings
-                . '</aside>';
-        if ($disable_pdf) {
-            $out .= '<div><a download id="download-pdf" onclick="printSeoReport()">Print Report</a></div>';
-        } else {
-            $out .= '<div><a download id="download-pdf" onclick="hasSupport()">Download PDF Report</a></div>';
-        }
-
-        $thumb_URL = "https://www.eranker.com/IMAGE"; //FIXTHIS
-
-        if (!isset($generalscore['thumbnail']) || empty($generalscore['thumbnail'])) {
-            $thumb_URL = self::$imgfolder . "loading-page-preview.gif";
-        } else {
-            $thumb_URL = $generalscore['thumbnail'];
-        }
-        $out .= '</div>' // end factors-percent
-                . '<div class="col-sm-8 col-md-5 col-lg-5 factors-score">' // factors score
-                . '<p>Report for URL:</p>'
-                . '<h1>' . $report_url . '</h1>'
-                . '<ul>'
-                . '<li class="col green"><i class="fa fa-check"></i><b class="factor-score">Successfully passed<span>' . $generalscore['factors']['green'] . '</span></b><div class="factorbar" style="width:' . ($generalscore['factors']['green'] * 100 / $score_raw_total) . '%"></div></li>'
-                . '<li class="col orange"><i class="fa fa-minus"></i><b class="factor-score">Room for improvement<span>' . $generalscore['factors']['orange'] . '</span></b><div class="factorbar" style="width:' . ($generalscore['factors']['orange'] * 100 / $score_raw_total) . '%"></div></li>'
-                . '<li class="col red"><i class="fa fa-times"></i><b class="factor-score">Errors<span>' . ( $generalscore['factors']['red'] + $generalscore['factors']['missing'] ) . '</span></b><div class="factorbar" style="width:' . ($generalscore['factors']['red'] * 100 / $score_raw_total) . '%"></div></li>'
-                . '</ul>'
-                . '<div class="clearfix"></div>'
-                . '</div>' // end factors-score
-                . '<div class=" col-md-5 col-lg-4 hidden-xs hidden-sm factors-site">' // site screen
-                . '<div class="printscreen">'
-                . '<img id="sitescreen" alt="Website Screenshot: ' . $report_url . '" src="' . $thumb_URL . '">' // actual site screen
-                . '</div>'
-                . '</div>'; // end factors-site
-        $out .= '</div><div class="clearfix"></div>'; // end score-table
-
-
 
         return $out;
     }
@@ -952,7 +970,7 @@ class eRankerCommons {
      * @param boolean $is_loggedin If the user is logged in
      * @return string the HTML of the rendered factor
      */
-    public static function getFactorHTML($report, $factor, $score, $is_even = false, $is_loggedin = false) {
+    public static function getFactorHTML($report, $factor, $score, $is_even = false, $is_loggedin = false, $show_header, $show_title, $show_category) {
         //For this to aways be tru for now
         $is_loggedin = true;
 
@@ -1190,7 +1208,7 @@ class eRankerCommons {
         $out = '';
         if (!empty($data)) {
             foreach ($data as $singleEmail) {
-                $out .= '<img src="' . self::$factorCreateImageFolder . 'createimage.php?size=11&transparent=1&padding=0&bgcolor=250&textcolor=50&text=' . urlencode(strrev(base64_encode($singleEmail))) . '" alt="Website Contact Email"><br />';
+                $out .= '<img src="' . self::$factorCreateImageFolder . 'createimage.php?size=11&amp;transparent=1&amp;padding=0&amp;bgcolor=250&amp;textcolor=50&amp;text=' . urlencode(strrev(base64_encode($singleEmail))) . '" alt="Website Contact Email"><br />';
             }
         }
 
@@ -1226,9 +1244,9 @@ class eRankerCommons {
         if (isset($data) && !empty($data)) {
             foreach ($data as $singlePhone) {
                 $country_code = $singlePhone['region'];
-                $out .= "<img src='".self::$imgfolder ."/flags/24/$country_code.png' style='height:24px;vertical-align:bottom;' alt='$country_code' title='$country_code' /> ";
+                $out .= "<img src='" . self::$imgfolder . "/flags/24/$country_code.png' style='height:24px;vertical-align:bottom;' alt='$country_code' title='$country_code' /> ";
                 $type = ucfirst(strtolower(str_replace("_", " ", $singlePhone['type'])));
-                $out .= '<img title="Type: ' . $type . '" src="' . self::$factorCreateImageFolder . 'createimage.php?size=11&transparent=1&padding=0&bgcolor=250&textcolor=50&text=' . urlencode(strrev(base64_encode($singlePhone['phone']))) . '" alt="Website Phone Number"> <br />';
+                $out .= '<img title="Type: ' . $type . '" src="' . self::$factorCreateImageFolder . 'createimage.php?size=11&amp;transparent=1&amp;padding=0&amp;bgcolor=250&amp;textcolor=50&amp;text=' . urlencode(strrev(base64_encode($singlePhone['phone']))) . '" alt="Website Phone Number"> <br />';
             }
         }
 
@@ -1285,36 +1303,144 @@ class eRankerCommons {
     }
 
     public static function guiAnchorstext($endModel, $data, $report) {
-        //var_dump($data);
-        $html = "<h4 class='marginbottom0'>Overall performance score: <b></b> out of 100</h4>"
-                . "<p>The page has a total of <b></b> HTTP requests and a total weight of <b>Kb</b> with empty cache</p>";
 
-        $charts = "";
-//        foreach ($chartsData as $chartNumber => $singleChart) {
-//            if (isset($data[$singleChart[0]["id"]]) && isset($data[$singleChart[1]["id"]]) && ($data[$singleChart[0]["id"]] + $data[$singleChart[1]["id"]]) > 0) {
-//                $charts .= "<div class='backlinkchartwrapper'><div style='width:100%;margin: 0 auto' class='backlinkchart' data-chartready='false' "
-//                        . "data-id1='" . $singleChart[0]["id"] . "' data-id2='" . $singleChart[1]["id"] . "' "
-//                        . "data-title1='" . $singleChart[0]["title"] . "' data-title2='" . $singleChart[1]["title"] . "' "
-//                        . "data-value1='" . $data[$singleChart[0]["id"]] . "'  data-value2='" . $data[$singleChart[1]["id"]] . "'></div></div>";
+        $count = count($data['anchors']);
+
+        $html = "";
+
+        $attr = '';
+
+        if (!empty($data['anchors'])) {
+            foreach ($data['anchors'] as $key => $value) {
+                $attr .= "data-anchor-" . $key . "='" . $value['anchor'] . "' data-backlinks-" . $key . "='" . $value['backlinks'] . "' ";
+            }
+        }
+
+        return $html . "<div class='anchorschart' data-chartready='false' data-totali=" . $count . " " . $attr . "></div>";
+    }
+
+    public static function guiMobileusability($endModel, $data, $report) {
+        $totalFail = 0;
+        $totalWarn = 0;
+        $html = '';
+        $htmlContentTable = "";
+//
+//        foreach ($data as $valueArray) {
+//            if (isset($valueArray["fail-count"])) {
+//                $totalFail = $valueArray["fail-count"];
+//            }
+//            if (isset($valueArray['warn-count'])) {
+//                $totalWarn = $valueArray["warn-count"];
+//            }
+//            if (!isset($valueArray["warn-count"]) || !isset($valueArray["fail-count"])) {
+//                $htmlContentTable .= "<tr>";
+//                $first = TRUE;
+//                foreach ($valueArray as $key => $value) {
+//                    if ($first) {
+//                        $icon = (strcasecmp($value, 'FAIL') === 0) ? "<i class='fa fa-times'></i>" : "<i class='fa fa-exclamation-triangle'></i>";
+//                        if (strcasecmp($key, "warn-count") !== 0 || strcasecmp($key, "fail-count") !== 0) {
+//                            $htmlContentTable .= "<td>" . $icon . "</td>";
+//                        }
+//                    } else {
+//                        if (strcasecmp($key, "warn-count") !== 0 || strcasecmp($key, "fail-count") !== 0) {
+//                            $htmlContentTable .= "<td>" . $value . "</td>";
+//                        }
+//                    }
+//                    $first = FALSE;
+//                }
+//                $htmlContentTable .= "</tr>";
 //            }
 //        }
-        $attr = '';        
-        $count = count($data['anchors']);
-        if (!empty($data['anchors'])) {
-           foreach ($data['anchors'] as $key => $value) {
-               $attr .= "data-anchor-".$key."='" .$value['anchor'] . "' data-backlinks-".$key."='" .$value['backlinks'] . "' ";
-               
-           }
-//           for ($i =1; $i <= $count; $i++){
-//               $attr .= "data-chartready='false' data-anchor-".$count."='" . $data['anchors'][$i]['anchor'] . " ";
-//           }
-       }     
+//
+//        $html .= "<div class='row'>";
+//        $html .= "<div class='col-lg-6'>";
+//        $html .= "<h4 class='marginbottom0'><i class='fa fa-times'></i> Fails " . $totalFail . "</h4>";
+//        $html .= "</div>";
+//        $html .= "<div class='col-lg-6'>";
+//        $html .= "<h4 class='marginbottom0'><i class='fa fa-exclamation-triangle'></i> Warns " . $totalWarn . "</h4>";
+//        $html .= "</div>";
+//        $html .= "</div>";
+//
+//        $html .= "<table class='table'>";
+//        $html .= "<thead>";
+//        $html .= "<tr>";
+//        $html .= "<th>Severety</th>";
+//        $html .= "<th>Description</th>";
+//        $html .= "<th>Best Pratice</th>";
+//        $html .= "</tr>";
+//        $html .= "</thead>";
+//        $html .= "<tbody>";
+//        $html .= $htmlContentTable;
+//        $html .= "</tbody>";
+//
+//        $html .= "</table>";
+//
+        return $endModel;
+    }
 
-        
-        $test = "[['aa',12],['ds',22],['a',16]]";
-       
-        return "<div class='anchorschart' data-chartready='false' total='1' ".$attr."></div>";
-       
+    public static function guiOngooglemaps($endModel, $data, $report) {
+        $html = "";
+        if (!empty($data)) {
+            $html .= "<div class='external-onmaps' >";
+            if (isset($data['latitude']) && isset($data['longitude']) && !isset($_GET['pdf']) && empty($_GET['pdf'])) {
+                $html .= "<div style='height: 250px;' id='map-googlemaps' data-gmapsmapready='false' data-googlemaps-latitude='" . $data['latitude'] . "' data-googlemaps-longitude='" . $data['longitude'] . "' data-googlemaps-accuracy='' data-googlemaps-title='" . $data['name'] . "' >";
+                //$html .= "<h5 style='margin-bottom: 0;'><strong>" . ucfirst($data['name']) . "</strong></h5>";
+                $html .= "</div>";
+            }
+
+            if (isset($data['photo']) && !empty($data['photo'])) {
+                $htmlphoto = '
+                <div style="background-color: #fafafa; background-image: url(\'' . $data['photo'] . '\'), url(\'' . self::$imgfolder . 'establishment-no-thumbnail-80px.png\'); border: 3px solid #DA4336;  position: absolute; top: -38px;  right: 0px; border-radius: 5px!important; width: 80px; height: 80px; background-repeat: no-repeat; background-size: cover; border-top-left-radius: 20px!important; background-position: center; border-bottom-right-radius: 20px !important;"></div>';
+            } else {
+                $htmlphoto = "";
+            }
+            if (isset($data['place_url']) && !empty($data['place_url'])) {
+                $onclick = "onclick='window.open(\"" . $data['place_url'] . "\")'";
+            } else {
+                $onclick = "";
+            }
+            $html .= "<div $onclick style='cursor:pointer; position:relative; border-bottom: 1px solid #EEE;  background-color: #DA4336; color: white; padding: 5px; font-family: arial,sans-serif-light,sans-serif; font-size: 20px;'>"
+                    . $htmlphoto . $data['name'] .
+                    "</div>";
+
+            $html .= "<div class='footer-map-onmaps'>";
+
+            $html .= "<span><strong>Address:</strong> " . $data['address'] . "</span><br/>";
+            if (isset($data['phones']) && !empty($data['phones'])) {
+                foreach ($data['phones'] as $value) {
+                    $html .= '<span><strong>Phone:</strong> <img title="Phone" src="' . self::$factorCreateImageFolder . 'createimage.php?size=11&amp;transparent=1&amp;padding=0&amp;bgcolor=250&amp;textcolor=50&amp;text=' . urlencode(strrev(base64_encode($value))) . '" alt="Phone Number"> <br /></span>';
+                }
+            }
+            if (isset($data['reviews'])) {
+                $html .= "<span><strong>Reviews:</strong> " . $data['reviews'] . "</span><br/>";
+            }
+            if (isset($data['rating'])) {
+                $html .= "<span><strong>Rating:</strong> ";
+                $html .= "<span class='errankerreportficons-yellow'>";
+                if ($data['rating'] !== 0) {
+                    $html .= '<span>' . round($data['rating'], 1) . '</span> ';
+                }
+                for ($i = 1; $i <= 5; $i++) {
+                    if ($i <= round($data['rating'])) {
+                        $html .= '<i class="fa fa-star"></i>'; //fa-star-half-o
+                    } else {
+                        $html .= '<i class="fa fa-star-o"></i>';
+                    }
+                }
+                $html .= "</span>";
+                $html .= "</span><br/>";
+            }
+            if (isset($data['website'])) {
+                $html .= "<span><strong>WebSite:</strong> <a href='" . $data['website'] . "' rel='nofollow' TARGET='_blank'>" . $data['website'] . "</a></span><br/>";
+            }
+
+            $html .= "</div>";
+            $html .= "</div>";
+        } else {
+            $html .= $endModel;
+        }
+
+        return $html;
     }
 
     public static function guiServerlocation($endModel, $data, $report) {
@@ -1337,7 +1463,7 @@ class eRankerCommons {
 
         $content = "";
         if (!empty($host)) {
-            $content .= "<h4 stype='margin-bottom: 0;'><strong>" . ucfirst($host) . "</strong></h4>";
+            $content .= "<h4 style='margin-bottom: 0;'><strong>" . ucfirst($host) . "</strong></h4>";
         }
 
         if (!empty($ip)) {
@@ -1353,13 +1479,17 @@ class eRankerCommons {
             $content .= "<strong>ZIP Code:</strong> " . $zip . "<br />";
         }
         if (!empty($country_code)) {
-            $content .= "<strong>Country:</strong> <img src='".self::$imgfolder ."/flags/24/$country_code.png' style='height: 16px;vertical-align: sub;' alt='$country_code' /> " . $country_name . "<br />";
+            $content .= "<strong>Country:</strong> <img src='" . self::$imgfolder . "/flags/24/$country_code.png' style='height: 16px;vertical-align: sub;' alt='$country_code' /> " . $country_name . "<br />";
         }
         if (!empty($timezone)) {
             $content .= "<strong>TimeZone:</strong> " . $timezone;
         }
-
-        $out .= '<div id="mapserverlocation" data-mapready="false" style="height: 450px" data-serverlocation-title="' . $host . '" data-serverlocation-accuracy="' . $accuracy_radius . '" data-serverlocation-latitude="' . str_replace(",", ".", $latitude) . '" data-serverlocation-longitude="' .  str_replace(",", ".", $longitude)  . '" >' . $content . '</div>';
+        if (!isset($_GET['pdf']) && empty($_GET['pdf'])) {
+            $idMap = "mapserverlocation";
+        } else {
+            $idMap = 'emptymap';
+        }
+        $out .= '<div id="' . $idMap . '" data-mapready="false" style="height: 450px" data-serverlocation-title="' . $host . '" data-serverlocation-accuracy="' . $accuracy_radius . '" data-serverlocation-latitude="' . str_replace(",", ".", $latitude) . '" data-serverlocation-longitude="' . str_replace(",", ".", $longitude) . '" >' . $content . '</div>';
 
         return !empty($data) ? $out : 'Server Location not found';
     }
@@ -1367,6 +1497,7 @@ class eRankerCommons {
     public static function guiGooglepreview($endModel, $data, $report) {
 
         $outString = '';
+
         if (isset($data) && !empty($data)) {
             foreach ($data as $key => $value) {
                 if (strcasecmp($key, 'title') === 0) {
@@ -1387,6 +1518,8 @@ class eRankerCommons {
                 }
             }
         }
+
+
 
 
         if (!empty($url_href) && !empty($title)) {
@@ -1425,8 +1558,8 @@ class eRankerCommons {
                         . "         <i class='fa $icon' style='background-color: $color'></i>"
                         . "     </div>"
                         . "     <div class='responsivenessdetails'>"
-                        . "         <div class='responsivenesslabel'>Browser:</div><div class='responsivenesslabelcontent'><img src='".self::$imgfolder ."/icons/" . (strtolower(str_replace(' ', '', $data[$key]['browser']))) . ".png' alt='Browser Icon' /> " . (isset($data[$key]['browser']) ? $data[$key]['browser'] : "") . "</div>"
-                        . "         <div class='responsivenesslabel'>OS:</div><div class='responsivenesslabelcontent'><img src='".self::$imgfolder ."/icons/" . (strtolower(str_replace(' ', '', $data[$key]['os']))) . ".png' alt='OS Icon' /> " . (isset($data[$key]['os']) ? $data[$key]['os'] : "") . "</div>"
+                        . "         <div class='responsivenesslabel'>Browser:</div><div class='responsivenesslabelcontent'><img src='" . self::$imgfolder . "/icons/" . (strtolower(str_replace(' ', '', $data[$key]['browser']))) . ".png' alt='Browser Icon' /> " . (isset($data[$key]['browser']) ? $data[$key]['browser'] : "") . "</div>"
+                        . "         <div class='responsivenesslabel'>OS:</div><div class='responsivenesslabelcontent'><img src='" . self::$imgfolder . "/icons/" . (strtolower(str_replace(' ', '', $data[$key]['os']))) . ".png' alt='OS Icon' /> " . (isset($data[$key]['os']) ? $data[$key]['os'] : "") . "</div>"
                         . "         <div class='responsivenesslabel'>Resolution:</div><div class='responsivenesslabelcontent'>" . $data[$key]['screen']["width"] . "x" . $data[$key]['screen']["height"] . "</div>"
                         . "         <div class='responsivenesslabel' title='Vertical Scrollbar'>V. Scrollbar:</div><div class='responsivenesslabelcontent'>" . ($data[$key]['scrollbar']["vertical"] ? "Yes" : "No") . "</div>"
                         . "         <div class='responsivenesslabel' title='Horizontal Scrollbar'>H. Scrollbar:</div><div class='responsivenesslabelcontent' style='" . ($data[$key]['scrollbar']["horizontal"] ? "color:" . $color : "") . "' >" . ($data[$key]['scrollbar']["horizontal"] ? "Yes" : "No") . "</div>"
@@ -1465,23 +1598,137 @@ class eRankerCommons {
         $urlsString = '';
         if (isset($data) && !empty($data)) {
             $outString = 'We found <strong>' . count($data) . ' </strong> website contents that have blocks similar to their website to know the probability of similarity, click each of the listed links.<hr></hr>';
-            foreach ($data as $key => $value) {
-                foreach ($value as $key2 => $value2) {
-                    if (strcasecmp($key2, 'title') === 0) {
-                        $title = $value2;
-                    }
-                    if (strcasecmp($key2, 'url') === 0) {
-                        $url_href = $value2;
-                    }
-                }
-                if (!empty($url_href) && !empty($title)) {
-                    $urlsString .= "<li><a href='$url_href' target='_blank'> $title </a><br /> </li>";
+            foreach ($data as $value) {
+                $title = $value;
+                if (!empty($title)) {
+                    $urlsString .= "<li> $title <br /> </li>";
                 }
             }
             $outString .= "<ul>$urlsString</ul>";
         }
 
-        return !empty($outString) ? $outString : 'Not Found.';
+        return !empty($outString) ? $outString : 'We could not find any duplicate content at the time.';
+    }
+
+    public static function guiBuiltwithlist($endModel, $data, $report) {
+
+        $html = '<p>We found these technologies that build your website.Check each type and ranking of sites that use these technologies<p>';
+        $html .='<br /><div>';
+        if (!empty($data)) {
+            foreach ($data as $singleTec) {
+                $html .='<label title="" class="labeltec">  ' . $singleTec . '</label>';
+            }
+        }
+
+        $html .='</div>';
+        return !empty($html) ? $html : 'Not Found.';
+    }
+
+    public static function guiSslcheck($endModel, $data, $report) {
+        $html = "";
+
+        if (!empty($data['trusted'])) {
+            if ($data['trusted']) {
+                $html .= "<h4><i class='fa fa-check green'></i> Valid SSL Certificate</h4>";
+            } else {
+
+                $html .= "<h4><i class='fa fa-times missing'></i> Invalid SSL Certificate</h4>";
+                $html .= "<span>" . $data['return_error'] . "<span>";
+            }
+        }
+
+        if (isset($data['common_name']) && !empty($data['common_name'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Common Name</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['common_name'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['organizational_unit']) && !empty($data['organizational_unit'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Organizational</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['organizational_unit'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['country']) && !empty($data['country'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Country</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['country'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['state']) && !empty($data['state'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>State</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['state'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['locality']) && !empty($data['locality'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Locality</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['locality'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['issuer_name']) && !empty($data['issuer_name'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Issuer Name</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['issuer_name'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['issuer_url']) && !empty($data['issuer_url'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Issuer Url</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['issuer_url'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['key_strength']) && !empty($data['key_strength'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Key Strength</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['key_strength'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+        if (isset($data['protocol']) && !empty($data['protocol'])) {
+            $html .= "<div class='row external-sslcheck'>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span><strong>Protocol</strong></span>";
+            $html .= "</div>";
+            $html .= "<div class='col-md-6'>";
+            $html .= "<span>" . $data['protocol'] . "</span>";
+            $html .= "</div>";
+            $html .= "</div>";
+        }
+
+        return $html;
     }
 
     public static function guiSpeedanalysis($model, $data, $report) {
