@@ -2,12 +2,6 @@
 
 global $erapi;
 
-// Load the wordpress framework
-$parse_uri = explode('content', __FILE__);
-require_once( $parse_uri[0] . 'wp-load.php' );
-$wp->init();
-
-
 require_once (dirname(dirname(__FILE__)) . '/libs/other/wkhtmltopdf/wkhtmltopdf.php');
 
 
@@ -37,7 +31,7 @@ $user = !empty($current_user) ? $current_user->ID : '';
 
 switch ($type) {
     case 'pdf':
-        $reporthtml = file_get_contents(WP_HOME . '/' . $report->domain . '/' . $report->id . '?pdf=1');
+        $reporthtml = file_get_contents('http://127.0.0.1/index.php?p=report&id=' . $report->id . '&pdf=1');
         $reportheader = '';
         $reportfooter = '';      
         $pdf = new WKPDF();

@@ -131,13 +131,13 @@ class WKPDF {
      * Constructor: initialize command line and reserve temporary file.
      */
     public function __construct() {
-        //       $this->cmd = $GLOBALS['WKPDF_BASE_PATH'] . 'wkhtmltopdf-' . self::_getCPU();
+//               $this->cmd = $GLOBALS['WKPDF_BASE_PATH'] . 'wkhtmltopdf-' . self::_getCPU();
 //        if (!file_exists($this->cmd)) {
         $this->cmd = "wkhtmltopdf";
 //        } else {
 //            chmod($this->cmd, 0755);
 //        }
-        //throw new Exception('WKPDF static executable "' . htmlspecialchars($this->cmd, ENT_QUOTES) . '" was not found.');
+//        throw new Exception('WKPDF static executable "' . htmlspecialchars($this->cmd, ENT_QUOTES) . '" was not found.');
         do {
             $rand = mt_rand();
             $this->tmp = $GLOBALS['WKPDF_BASE_PATH'] . 'tmp/' . $rand . '.html';
