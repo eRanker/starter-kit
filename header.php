@@ -9,18 +9,18 @@
         <title><?PHP echo $page_desc . " - " . $project_name ?></title>
 
         <!-- Theme CSS -->
-        <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-        <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
-        <link href="../bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css" rel="stylesheet">
+        <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+        <link href="/bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css" rel="stylesheet">
 
         <!-- Project Base CSS -->
-        <link href="../css/base.css" rel="stylesheet">
+        <link href="/css/base.css" rel="stylesheet">
 
         <!-- Report Page CSS -->
-        <link href="../css/report.css" rel="stylesheet">
+        <link href="/css/report.css" rel="stylesheet">
         <?php if (isset($_GET['pdf']) && !empty($_GET['pdf'])) { ?>
-            <link href="../css/reportpdf.css" rel="stylesheet">
+            <link href="/css/reportpdf.css" rel="stylesheet">
         <?php } ?>
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -42,7 +42,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php"><img src="img/logo-30px.png" width="30" height="30" style="display: inline;" alt="<?PHP echo $project_name ?>" /> <?PHP echo $project_name ?></a>
+                    <a class="navbar-brand" href="index.php"><img src="/img/logo-30px.png" width="30" height="30" style="display: inline;" alt="<?PHP echo $project_name ?>" /> <?PHP echo $project_name ?></a>
                 </div>
                 <!-- /.navbar-header -->
 
