@@ -32,8 +32,8 @@ $user = !empty($current_user) ? $current_user->ID : '';
 switch ($type) {
     case 'pdf':
         $reporthtml = file_get_contents('http://' . $_SERVER['HTTP_HOST'] . '/index.php?p=report&id=' . $report->id . '&pdf=1');
-        $reportheader = file_get_contents(dirname(dirname(__FILE__)) . '/libs/report-pdf-header.php');
-        $reportfooter = file_get_contents(dirname(dirname(__FILE__)) . '/libs/report-pdf-footer.php');
+        $reportheader = file_get_contents('http://' . $_SERVER['HTTP_HOST'] . '/libs/report-pdf-header.php');
+        $reportfooter = file_get_contents('http://' . $_SERVER['HTTP_HOST'] . '/libs/report-pdf-footer.php');
         $pdf = new WKPDF();
         $pdf->set_html($reporthtml);
         $pdf->set_header($reportheader);
