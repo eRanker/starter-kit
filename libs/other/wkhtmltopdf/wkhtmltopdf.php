@@ -279,7 +279,7 @@ class WKPDF {
      * @return string WKHTMLTOPDF HTML help.
      */
     public function get_help() {
-        $tmp = self::_pipeExec('"' . $this->cmd . '" --extended-help');
+        $tmp = self::_pipeExec( $this->cmd . ' --extended-help');
         return $tmp['stdout'];
     }
 
@@ -290,10 +290,10 @@ class WKPDF {
 //        echo basename($this->tmp);
 //        echo file_get_contents($this->tmp);
 //        die;
-        $web = $GLOBALS['WKPDF_BASE_SITE'] . 'content/themes/eranker/libs/other/wkhtmltopdf/tmp/' . basename($this->tmp);
+        $web = $GLOBALS['WKPDF_BASE_SITE'] . 'libs/other/wkhtmltopdf/tmp/' . basename($this->tmp);
 //if($d){ echo $web; exit(); } // for fast debug purpose 
-        $footer = $GLOBALS['WKPDF_BASE_SITE'] . 'content/themes/eranker/libs/other/wkhtmltopdf/tmp/' . str_replace('.html', '_footer.html', basename($this->tmp));
-        $header = $GLOBALS['WKPDF_BASE_SITE'] . 'content/themes/eranker/libs/other/wkhtmltopdf/tmp/' . str_replace('.html', '_header.html', basename($this->tmp));
+        $footer = $GLOBALS['WKPDF_BASE_SITE'] . 'libs/other/wkhtmltopdf/tmp/' . str_replace('.html', '_footer.html', basename($this->tmp));
+        $header = $GLOBALS['WKPDF_BASE_SITE'] . 'libs/other/wkhtmltopdf/tmp/' . str_replace('.html', '_header.html', basename($this->tmp));
 
         if ($this->footer_spacing == 0) {
             $footerline = " --footer-line ";
@@ -313,7 +313,7 @@ class WKPDF {
         // --viewport-size 1920 --page-width 1920 --page-size a4 http://www.eranker.com/vacarescu.ro/2525?pdf=1  output.pdf   
 
 
-        $c = '"' . $this->cmd . '" '
+        $c = '' . $this->cmd . ' '
 //                . (($this->copies > 1) ? ' --copies ' . $this->copies : '')                              // number of copies
                 . ' --header-html "' . $header . '" '
                 . ' --footer-html "' . $footer . '" '
