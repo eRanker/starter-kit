@@ -109,3 +109,18 @@ tfoot { display: table-footer-group }
         float: left !important;
     }
 }
+
+
+nav.navbar{
+    display: none !important;
+}
+
+#page-wrapper{
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    border: 0px !important;
+}
+
+body {
+    background-color: #ffffff !important;
+}

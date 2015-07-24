@@ -5,7 +5,7 @@
     </head>
     <body>
         <div  style="margin-bottom: 20px;">            
-            <img src="http://www.eranker.com/content/themes/eranker/img/logo-blue.png" alt="" style="float:left; max-height: 1.0cm" />            
+            <img src="/img/eranker-logo-blue.png" alt="" style="float:left; max-height: 1.0cm" />            
             <div style="font: 400 13px 'Open Sans',HelveticaNeue,Helvetica,Arial; float: right; color: #333;text-align: right;"> 
                 <strong>eRanker</strong>
                 <br />
