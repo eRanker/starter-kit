@@ -57,11 +57,7 @@
                             <li>
                                 <a  href="/index.php?p=accountinfo" <?PHP echo (strcmp('accountinfo', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-user fa-fw"></i> Settings</a>
                             </li>     
-                            <li class="divider"></li>
-                            <li>      
-                                <a href="/index.php?p=help" <?PHP echo (strcmp('help', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-life-ring fa-fw"></i> Help</a>
-                            </li>
-
+<!--                            <li class="divider"></li>-->
                         </ul>
                         <!-- /.dropdown-user -->
                     </li>
@@ -84,9 +80,6 @@
                             </li>
                             <li>
                                 <a href="/index.php?p=accountinfo" <?PHP echo (strcmp('accountinfo', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-user fa-fw"></i> Account Info</a>
-                            </li>
-                            <li>
-                                <a href="/index.php?p=help" <?PHP echo (strcmp('help', $page) === 0) ? 'class="active"' : '' ?>><i class="fa fa-life-ring fa-fw"></i> Help</a>
                             </li>
 
                         </ul>
